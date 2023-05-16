@@ -20,12 +20,12 @@ int __slideArgument    (int argc, char *argv[], size_t index, size_t n);
  * @param argv Commandline parameter.
  * @param options Option list.
  * @param optarg Found option's argument. If option has no argument, this value is "".
- * @param pos Parsed parameter index. After parsed, this means the head of the non-option's parameter. At first, this must be 0.
+ * @param optind Parsed parameter index. After parsed, this means the head of the non-option's parameter. At first, this must be 0.
  * @return Found option's ID (= PsrArgumentObject_t.id). If something occured, this returns "Rsr Result" item.
  **/
-int persoropt(int argc, char **argv, const PsrArgumentObject_t *options, char optarg[PSR_BUF_SIZE], int *pos)
+int persoropt(int argc, char **argv, const PsrArgumentObject_t *options, char optarg[PSR_BUF_SIZE], int *optind)
 {
-    int p = *pos;
+    int p = *optind;
     const size_t OPT_HEADER_LEN_S = strlen(OPT_HEADER_SHORT);
     const size_t OPT_HEADER_LEN_L = strlen(OPT_HEADER_LONG);
     int param_cnt;
@@ -51,7 +51,7 @@ int persoropt(int argc, char **argv, const PsrArgumentObject_t *options, char op
     if (p == 0)
     {
         p = 1;
-        *pos = 1;
+        *optind = 1;
     }
 
     // find option
@@ -118,21 +118,21 @@ int persoropt(int argc, char **argv, const PsrArgumentObject_t *options, char op
     // case.1
     // aaa.exe A B -a -b   ------------>   aaa.exe -a A B -b
     //         ^    ^  ^                            ^ ^
-    //         pos  p  p+param_cnt                pos pos+param_cnt...next-pos
+    //      optind  p  p+param_cnt             optind optind+param_cnt...next-optind
     //
     // case.2
     // aaa.exe A B -a X -b   ------------>   aaa.exe -a X A B -b
     //         ^    ^    ^                            ^   ^
-    //         pos  p    p+param_cnt                pos   pos+param_cnt...next-pos
+    //      optind  p    p+param_cnt             optind   optind+param_cnt...next-optind
     //
     // case.3
     // aaa.exe A B -aX -b   ------------>   aaa.exe -aX A B -b
     //         ^    ^   ^                            ^  ^
-    //         pos  p   p+param_cnt                pos  pos+param_cnt...next-pos
+    //      optind  p   p+param_cnt             optind  optind+param_cnt...next-optind
     int i;
     for (i = 0; i < param_cnt; i++)
     {
-        if (__slideArgument(argc, argv, p + i, p - *pos))
+        if (__slideArgument(argc, argv, p + i, p - *optind))
         {
             return PSR_ERROR;
         }
@@ -150,12 +150,12 @@ int persoropt(int argc, char **argv, const PsrArgumentObject_t *options, char op
         if (arg_length == OPT_HEADER_LEN_S + 1)
         {
             // -a XXX
-            strcpy(buf, argv[*pos + 1]);
+            strcpy(buf, argv[*optind + 1]);
         }
         else
         {
             // -aXXX
-            strcpy(buf, argv[*pos] + OPT_HEADER_LEN_S + 1);
+            strcpy(buf, argv[*optind] + OPT_HEADER_LEN_S + 1);
         }
     }
     else if (options[idx].has_arg == OPTIONAL_ARGUMENT)
@@ -168,12 +168,12 @@ int persoropt(int argc, char **argv, const PsrArgumentObject_t *options, char op
         else
         {
             // -aXXX
-            strcpy(buf, argv[*pos] + OPT_HEADER_LEN_S + 1);
+            strcpy(buf, argv[*optind] + OPT_HEADER_LEN_S + 1);
         }
     }
 
-    // update pos
-    *pos += param_cnt;
+    // update optind
+    *optind += param_cnt;
     // update optarg
     strcpy(optarg, buf);
 
@@ -226,7 +226,7 @@ int __isPsrArgumentEnd(const PsrArgumentObject_t *options)
 
 
 /**
- * @brief Slide argument to left. e.g. (p = pos+2) EXE A B -a -b -----> EXE -a A B -b
+ * @brief Slide argument to left. e.g. (p = optind+2) EXE A B -a -b -----> EXE -a A B -b
  * @param argc `argv` array length.
  * @param argv Commandline parameter.
  * @param index Index of the argument item you want to slide.

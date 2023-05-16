@@ -62,7 +62,7 @@ int persoropt(
     char  **argv                      ,
     const PsrArgumentObject_t *options,
     char  optarg[PSR_BUF_SIZE]        ,
-    int   *pos
+    int   *optind
 );
 
 // --------------------

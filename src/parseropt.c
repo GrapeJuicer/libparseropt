@@ -41,17 +41,17 @@ int persoropt(int argc, char **argv, const PsrArgumentObject_t *options, char op
         return PSR_ERROR;
     }
 
-    // end
-    if (p >= argc)
-    {
-        return PSR_NOT_FOUND;
-    }
-
     // skip argv[0]
     if (p == 0)
     {
         p = 1;
         *optind = 1;
+    }
+
+    // end
+    if (p >= argc)
+    {
+        return PSR_NOT_FOUND;
     }
 
     // find option

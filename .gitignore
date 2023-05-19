@@ -61,3 +61,13 @@ test/
 *.org
 *.tmp
 *.temp
+CMakeFiles/
+Makefile
+CMakeCache.txt
+*.cmake
+
+example/*/*
+!example/*/*.c
+!example/*/*.h
+!example/*/Makefile
+!example/*/make.bat

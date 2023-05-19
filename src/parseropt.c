@@ -70,6 +70,7 @@ int persoropt(int argc, char **argv, const PsrArgumentObject_t *options, char op
                 return PSR_UNKNOWN_OPTION;
             }
 
+            // get width and option's argument
             switch (options[idx].has_arg)
             {
             case NO_ARGUMENT:
@@ -81,14 +82,27 @@ int persoropt(int argc, char **argv, const PsrArgumentObject_t *options, char op
                 break;
             case REQUIRE_ARGUMENT:
                 param_cnt = (arg_length == OPT_HEADER_LEN_S + 1 ? 2 : 1);
-                if (param_cnt == 2 && p + 1 >= argc)
+                if (param_cnt == 2)
                 {
-                    // last element
-                    return PSR_REQ_ARG_HAS_NO_ARG;
+                    if (p + 1 >= argc)
+                    {
+                        // last element
+                        return PSR_REQ_ARG_HAS_NO_ARG;
+                    }
+                    strcpy(buf, argv[p + 1]);
+                }
+                else // param_cnt == 1
+                {
+                    strcpy(buf, &argv[p][OPT_HEADER_LEN_S + 1]);
                 }
                 break;
             case OPTIONAL_ARGUMENT:
                 param_cnt = 1;
+                if (arg_length > OPT_HEADER_LEN_S + 1)
+                {
+                    // -aXXX
+                    strcpy(buf, &argv[p][OPT_HEADER_LEN_S + 1]);
+                }
                 break;
             default:
                 return PSR_ERROR;
@@ -140,38 +154,6 @@ int persoropt(int argc, char **argv, const PsrArgumentObject_t *options, char op
 
     // get id and option's argument
     ret = options[idx].id;
-    if (options[idx].has_arg == NO_ARGUMENT)
-    {
-        // -a
-        // pass
-    }
-    else if (options[idx].has_arg == REQUIRE_ARGUMENT)
-    {
-        if (arg_length == OPT_HEADER_LEN_S + 1)
-        {
-            // -a XXX
-            strcpy(buf, argv[*optind + 1]);
-        }
-        else
-        {
-            // -aXXX
-            strcpy(buf, argv[*optind] + OPT_HEADER_LEN_S + 1);
-        }
-    }
-    else if (options[idx].has_arg == OPTIONAL_ARGUMENT)
-    {
-        if (arg_length == OPT_HEADER_LEN_S + 1)
-        {
-            // -a
-            //pass
-        }
-        else
-        {
-            // -aXXX
-            strcpy(buf, argv[*optind] + OPT_HEADER_LEN_S + 1);
-        }
-    }
-
     // update optind
     *optind += param_cnt;
     // update optarg

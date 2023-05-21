@@ -11,20 +11,20 @@ extern "C" {
 
 #define PSR_BUF_SIZE 512
 
-#define PSR_ARG_NONE_ID        0
-#define PSR_ARG_NONE_SHORT_OPT (char)0
-#define PSR_ARG_NONE_LONG_OPT  ""
-#define PSR_ARG_NONE_HAS_ARG   NO_ARGUMENT
-#define PSR_ARG_NONE_PRIORITY  0
-#define PSR_ARG_NONE_CALLFUNC  NULL
+#define NONE_ID        0
+#define NONE_SHORT_OPT (char)0
+#define NONE_LONG_OPT  ""
+#define NONE_HAS_ARG   NO_ARGUMENT
+#define NONE_PRIORITY  0
+#define NONE_CALLFUNC  NULL
 
-#define PSR_ARG_END {       \
-    PSR_ARG_NONE_ID,        \
-    PSR_ARG_NONE_SHORT_OPT, \
-    PSR_ARG_NONE_LONG_OPT,  \
-    PSR_ARG_NONE_HAS_ARG,   \
-    PSR_ARG_NONE_PRIORITY,  \
-    PSR_ARG_NONE_CALLFUNC   \
+#define PSR_ARG_END { \
+    NONE_ID,          \
+    NONE_SHORT_OPT,   \
+    NONE_LONG_OPT,    \
+    NONE_HAS_ARG,     \
+    NONE_PRIORITY,    \
+    NONE_CALLFUNC     \
 }
 #define OPT_HEADER_SHORT "-"
 #define OPT_HEADER_LONG "--"

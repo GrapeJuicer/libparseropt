@@ -289,12 +289,12 @@ int __shortOptionIndex(char s, const PsrArgumentObject_t *options)
  **/
 int __isPsrArgumentEnd(const PsrArgumentObject_t *options)
 {
-    return (options->id        == PSR_ARG_NONE_ID                 &&
-            options->short_opt == PSR_ARG_NONE_SHORT_OPT          &&
-            strcmp(options->long_opt, PSR_ARG_NONE_LONG_OPT) == 0 &&
-            options->has_arg   == PSR_ARG_NONE_HAS_ARG            &&
-            options->priority  == PSR_ARG_NONE_PRIORITY           &&
-            options->callfunc  == PSR_ARG_NONE_CALLFUNC) ? 1 : 0;
+    return (options->id        == NONE_ID                 &&
+            options->short_opt == NONE_SHORT_OPT          &&
+            strcmp(options->long_opt, NONE_LONG_OPT) == 0 &&
+            options->has_arg   == NONE_HAS_ARG            &&
+            options->priority  == NONE_PRIORITY           &&
+            options->callfunc  == NONE_CALLFUNC) ? 1 : 0;
 }
 
 

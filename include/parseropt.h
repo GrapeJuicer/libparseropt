@@ -34,6 +34,7 @@ extern "C" {
 #define PSR_UNKNOWN_OPTION      -2
 #define PSR_NO_ARG_HAS_ARG      -3
 #define PSR_REQ_ARG_HAS_NO_ARG  -4
+#define PSR_OPT_ARG_HAS_ONLY_EQ -5
 #define PSR_ERROR               -10
 
 // types --------------------

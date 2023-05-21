@@ -271,7 +271,7 @@ int __shortOptionIndex(char s, const PsrArgumentObject_t *options)
     int i;
     for (i = 0; __isPsrArgumentEnd(&options[i]) == 0; i++)
     {
-        if (options[i].short_opt != PSR_ARG_NONE_SHORT_OPT && s == options[i].short_opt)
+        if (options[i].short_opt != NONE_SHORT_OPT && s == options[i].short_opt)
         {
             // found
             return i;
@@ -337,7 +337,7 @@ int __longOptionIndex(char *s, const PsrArgumentObject_t *options)
     int i;
     for (i = 0; __isPsrArgumentEnd(&options[i]) == 0; i++)
     {
-        if (strcmp(options[i].long_opt, PSR_ARG_NONE_SHORT_OPT) != 0 && strcmp(s, options[i].long_opt) == 0)
+        if (strcmp(options[i].long_opt, NONE_LONG_OPT) != 0 && strcmp(s, options[i].long_opt) == 0)
         {
             // found
             return i;

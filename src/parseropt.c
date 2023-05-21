@@ -7,6 +7,7 @@
 int __shortOptionIndex (char s, const PsrArgumentObject_t *options);
 int __isPsrArgumentEnd (const PsrArgumentObject_t *options);
 int __slideArgument    (int argc, char *argv[], size_t index, size_t n);
+int __longOptionIndex  (char *s, const PsrArgumentObject_t *options);
 
 
 // void setPriority(int argc, char **argv, PsrArgumentObject_t *options)
@@ -57,8 +58,95 @@ int persoropt(int argc, char **argv, const PsrArgumentObject_t *options, char op
     while (p < argc)
     {
         arg_length = strlen(argv[p]);
+        // is valid long option format
+        if (!strncmp(argv[p], OPT_HEADER_LONG, OPT_HEADER_LEN_L) && arg_length > OPT_HEADER_LEN_L)
+        {
+            // is valid option
+
+            // search option
+            char tmp[PSR_BUF_SIZE] = "";
+            char *pa = strchr(argv[p] + OPT_HEADER_LEN_L, '=');
+            if (pa == NULL)
+            {
+                // --alpha
+                // --alpha XXX
+                strcpy(tmp, argv[p] + OPT_HEADER_LEN_L);
+            }
+            else
+            {
+                // --alpha=XXX
+                strncpy(tmp, argv[p] + OPT_HEADER_LEN_L, pa - argv[p] - OPT_HEADER_LEN_L);
+            }
+
+            // tmp is long option name
+            idx = __longOptionIndex(tmp, options);
+
+            if (idx < 0)
+            {
+                // invalid option
+                return PSR_UNKNOWN_OPTION;
+            }
+
+            switch (options[idx].has_arg)
+            {
+            case NO_ARGUMENT:
+                param_cnt = 1;
+                if (pa != NULL)
+                {
+                    return PSR_NO_ARG_HAS_ARG;
+                }
+                break;
+            case REQUIRE_ARGUMENT:
+                // OK  exe --alpha XXX   pa=null  param_cnt=2
+                // OK  exe --alpha=XXX   pa=8     param_cnt=1
+                // NG  exe --alpha       pa=null  param_cnt=2
+                // NG  exe --alpha=      pa=8     param_cnt=1
+                param_cnt = (pa == NULL ? 2 : 1);
+
+                if (param_cnt == 1)
+                {
+                    // exe --alpha=
+                    if (strlen(pa + 1) == 0)
+                    {
+                        return PSR_REQ_ARG_HAS_NO_ARG;
+                    }
+                    // exe --alpha=XXX
+                    strcpy(buf, pa + 1);
+                }
+                else // param_cnt == 2
+                {
+                    // exe --alpha
+                    if (p + 1 >= argc)
+                    {
+                        return PSR_REQ_ARG_HAS_NO_ARG;
+                    }
+                    // exe --alpha XXX
+                    strcpy(buf, argv[p + 1]);
+                }
+                break;
+            case OPTIONAL_ARGUMENT:
+                param_cnt = 1;
+                // --alpha=XXX, --alpha=
+                if (pa != NULL)
+                {
+                    // --alpha=
+                    if (strlen(pa + 1) == 0)
+                    {
+                        return PSR_ERROR;
+                    }
+                    // --alpha=XXX
+                    strcpy(buf, pa + 1);
+                }
+                // else --alpha
+                break;
+            default:
+                return PSR_ERROR;
+            }
+
+            break;
+        }
         // is valid short option format
-        if (!strncmp(argv[p], OPT_HEADER_SHORT, OPT_HEADER_LEN_S) && arg_length > OPT_HEADER_LEN_S)
+        else if (!strncmp(argv[p], OPT_HEADER_SHORT, OPT_HEADER_LEN_S) && arg_length > OPT_HEADER_LEN_S)
         {
             // is valid option
             idx = __shortOptionIndex(argv[p][OPT_HEADER_LEN_S], options);
@@ -108,11 +196,6 @@ int persoropt(int argc, char **argv, const PsrArgumentObject_t *options, char op
             }
 
             break;
-        }
-        // is valid long option format
-        else if (!strncmp(argv[p], OPT_HEADER_LONG, OPT_HEADER_LEN_L) && arg_length > OPT_HEADER_LEN_L)
-        {
-            // is valid option
         }
         // not option
         else
@@ -228,4 +311,27 @@ int __slideArgument(int argc, char *argv[], size_t index, size_t n)
     }
 
     return 0;
+}
+
+
+
+/**
+ * @brief Get short option index which is matched with variable `s`.
+ * @param s Short option you want to search.
+ * @param options Option list.
+ * @return Found: Matched option's index / Not Found: -1
+ **/
+int __longOptionIndex(char *s, const PsrArgumentObject_t *options)
+{
+    int i;
+    for (i = 0; __isPsrArgumentEnd(&options[i]) == 0; i++)
+    {
+        if (strcmp(s, options[i].long_opt) == 0)
+        {
+            // found
+            return i;
+        }
+    }
+    // not found
+    return -1;
 }

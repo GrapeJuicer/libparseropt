@@ -12,9 +12,9 @@ int main(int argc, char *argv[])
 {
     // declare options
     PsrArgumentObject_t options[] = {
-        {.id = ID_NO_ARG  , .short_opt = 'n', .long_opt = "no"      , .has_arg = NO_ARGUMENT      , .priority = PSR_ARG_NONE_PRIORITY, .callfunc = PSR_ARG_NONE_CALLFUNC},
-        {.id = ID_REQ_ARG , .short_opt = 'r', .long_opt = "require" , .has_arg = REQUIRE_ARGUMENT , .priority = PSR_ARG_NONE_PRIORITY, .callfunc = PSR_ARG_NONE_CALLFUNC},
-        {.id = ID_OPT_ARG , .short_opt = 'o', .long_opt = "optional", .has_arg = OPTIONAL_ARGUMENT, .priority = PSR_ARG_NONE_PRIORITY, .callfunc = PSR_ARG_NONE_CALLFUNC},
+        {.id = ID_NO_ARG  , .short_opt = 'n', .long_opt = PSR_ARG_NONE_LONG_OPT, .has_arg = NO_ARGUMENT      , .priority = PSR_ARG_NONE_PRIORITY, .callfunc = PSR_ARG_NONE_CALLFUNC},
+        {.id = ID_REQ_ARG , .short_opt = 'r', .long_opt = PSR_ARG_NONE_LONG_OPT, .has_arg = REQUIRE_ARGUMENT , .priority = PSR_ARG_NONE_PRIORITY, .callfunc = PSR_ARG_NONE_CALLFUNC},
+        {.id = ID_OPT_ARG , .short_opt = 'o', .long_opt = PSR_ARG_NONE_LONG_OPT, .has_arg = OPTIONAL_ARGUMENT, .priority = PSR_ARG_NONE_PRIORITY, .callfunc = PSR_ARG_NONE_CALLFUNC},
         PSR_ARG_END
     };
 

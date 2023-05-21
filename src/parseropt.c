@@ -33,7 +33,6 @@ int persoropt(int argc, char **argv, const PsrArgumentObject_t *options, char op
     size_t arg_length;
     char *param;
     char buf[PSR_BUF_SIZE] = "";
-    int ret;
 
     // out of range
     if (p < 0)
@@ -152,8 +151,6 @@ int persoropt(int argc, char **argv, const PsrArgumentObject_t *options, char op
         }
     }
 
-    // get id and option's argument
-    ret = options[idx].id;
     // update optind
     *optind += param_cnt;
     // update optarg
@@ -165,7 +162,7 @@ int persoropt(int argc, char **argv, const PsrArgumentObject_t *options, char op
         options[idx].callfunc(strcmp(optarg, "") == 0 ? NULL : optarg);
     }
 
-    return ret;
+    return options[idx].id;
 }
 
 

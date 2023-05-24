@@ -60,7 +60,7 @@ int persoropt(int argc, char **argv, const PsrArgumentObject_t *options, char op
     {
         arg_length = strlen(argv[p]);
         // is valid long option format
-        if (!strncmp(argv[p], OPT_HEADER_LONG, OPT_HEADER_LEN_L) && arg_length > OPT_HEADER_LEN_L)
+        if (strcmp(argv[p], OPT_HEADER_SHORT) && !strncmp(argv[p], OPT_HEADER_LONG, OPT_HEADER_LEN_L) && arg_length > OPT_HEADER_LEN_L)
         {
             // is valid option
 
@@ -153,7 +153,7 @@ int persoropt(int argc, char **argv, const PsrArgumentObject_t *options, char op
             break;
         }
         // is valid short option format
-        else if (!strncmp(argv[p], OPT_HEADER_SHORT, OPT_HEADER_LEN_S) && arg_length > OPT_HEADER_LEN_S)
+        else if (strcmp(argv[p], OPT_HEADER_LONG) && !strncmp(argv[p], OPT_HEADER_SHORT, OPT_HEADER_LEN_S) && arg_length > OPT_HEADER_LEN_S)
         {
             // is valid option
             idx = __shortOptionIndex(argv[p][OPT_HEADER_LEN_S], options);
@@ -323,7 +323,6 @@ int __slideArgument(int argc, char *argv[], size_t index, size_t n)
 
     return 0;
 }
-
 
 
 /**

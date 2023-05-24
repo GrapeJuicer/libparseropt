@@ -26,8 +26,9 @@ extern "C" {
     NONE_PRIORITY,    \
     NONE_CALLFUNC     \
 }
-#define OPT_HEADER_SHORT "-"
-#define OPT_HEADER_LONG "--"
+
+#define OPT_DEFAULT_HEADER_SHORT "-"
+#define OPT_DEFAULT_HEADER_LONG "--"
 
 // Rsr Result
 #define PSR_NOT_FOUND           -1
@@ -57,6 +58,8 @@ typedef struct
 } PsrArgumentObject_t;
 
 // prototype declarations --------------------
+
+int setHeader(char *__short, char *__long);
 
 int persoropt(
     int   argc                        ,

@@ -1,0 +1,7 @@
+TARGET = header_override
+
+all:
+	gcc main.c -I../../include -L../.. -lparseropt -o $(TARGET)
+
+clean:
+	rm $(TARGET)

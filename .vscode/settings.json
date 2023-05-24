@@ -5,5 +5,8 @@
     "[bat]":{
         "files.eol": "\r\n",
         "files.encoding": "shiftjis"
+    },
+    "files.associations": {
+        "parseropt.h": "c"
     }
 }

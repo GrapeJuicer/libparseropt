@@ -2,6 +2,11 @@
 #include <string.h>
 #include <stdio.h>
 
+// variables --------------------
+
+static char OPT_HEADER_LONG[PSR_BUF_SIZE] = OPT_DEFAULT_HEADER_LONG;
+static char OPT_HEADER_SHORT[PSR_BUF_SIZE] = OPT_DEFAULT_HEADER_SHORT;
+
 // prototype declarations --------------------
 
 int __shortOptionIndex (char s, const PsrArgumentObject_t *options);
@@ -13,6 +18,27 @@ int __longOptionIndex  (char *s, const PsrArgumentObject_t *options);
 // void setPriority(int argc, char **argv, PsrArgumentObject_t *options)
 // {
 // }
+
+
+
+/**
+ * @brief Set header string.
+ * @param short New short option header string. If you don't set new header, set NULL to argument.
+ * @param long New long option header string. If you don't set new header, set NULL to argument.
+ * @return 0: success / 1: failure
+ **/
+int setHeader(char *__short, char *__long)
+{
+    if (__short != NULL && strlen(__short) > 0)
+    {
+        strcpy(OPT_HEADER_SHORT, __short);
+    }
+
+    if (__long != NULL && strlen(__long) > 0)
+    {
+        strcpy(OPT_HEADER_LONG, __long);
+    }
+}
 
 
 /**

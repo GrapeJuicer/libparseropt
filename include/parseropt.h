@@ -11,7 +11,7 @@ extern "C" {
 
 #define PSR_BUF_SIZE 512
 
-#define NONE_ID        0
+#define NONE_ID        -1
 #define NONE_SHORT_OPT (char)0
 #define NONE_LONG_OPT  ""
 #define NONE_HAS_ARG   NO_ARGUMENT

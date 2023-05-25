@@ -20,7 +20,6 @@ int __longOptionIndex  (char *s, const PsrArgumentObject_t *options);
 // }
 
 
-
 /**
  * @brief Set header string.
  * @param short New short option header string. If you don't set new header, set NULL to argument.
@@ -197,12 +196,6 @@ int persoropt(int argc, char **argv, const PsrArgumentObject_t *options, char op
             {
             case NO_ARGUMENT:
                 param_cnt = 1;
-                // if (arg_length != OPT_HEADER_LEN_S + 1)
-                // {
-                //     *optind = p;
-                //     return PSR_NO_ARG_HAS_ARG;
-                // }
-
                 // short option continues
                 if (arg_length > OPT_HEADER_LEN_S + sopt_cnt + 1)
                 {

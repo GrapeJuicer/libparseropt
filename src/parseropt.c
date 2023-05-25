@@ -60,6 +60,7 @@ int persoropt(int argc, char **argv, const PsrArgumentObject_t *options, char op
     size_t arg_length;
     char *param;
     char buf[PSR_BUF_SIZE] = "";
+    static int sopt_cnt = 0; // for #7
 
     // out of range
     if (p < 0)
@@ -173,7 +174,7 @@ int persoropt(int argc, char **argv, const PsrArgumentObject_t *options, char op
                 break;
             default:
                 *optind = p;
-                return PSR_ERROR;
+                return PSR_ERROR - 300;
             }
 
             break;
@@ -182,7 +183,7 @@ int persoropt(int argc, char **argv, const PsrArgumentObject_t *options, char op
         else if (strcmp(argv[p], OPT_HEADER_LONG) && !strncmp(argv[p], OPT_HEADER_SHORT, OPT_HEADER_LEN_S) && arg_length > OPT_HEADER_LEN_S)
         {
             // is valid option
-            idx = __shortOptionIndex(argv[p][OPT_HEADER_LEN_S], options);
+            idx = __shortOptionIndex(argv[p][OPT_HEADER_LEN_S + sopt_cnt], options);
 
             if (idx < 0)
             {
@@ -196,14 +197,55 @@ int persoropt(int argc, char **argv, const PsrArgumentObject_t *options, char op
             {
             case NO_ARGUMENT:
                 param_cnt = 1;
-                if (arg_length != OPT_HEADER_LEN_S + 1)
+                // if (arg_length != OPT_HEADER_LEN_S + 1)
+                // {
+                //     *optind = p;
+                //     return PSR_NO_ARG_HAS_ARG;
+                // }
+
+                // short option continues
+                if (arg_length > OPT_HEADER_LEN_S + sopt_cnt + 1)
                 {
-                    *optind = p;
-                    return PSR_NO_ARG_HAS_ARG;
+                    sopt_cnt++;
+                }
+                // not continue
+                else
+                {
+                    sopt_cnt = 0;
+                }
+
+                if (sopt_cnt == 1) // only first
+                {
+                    int i;
+                    int j;
+                    int has_req_arg = 0;
+                    for (i = OPT_HEADER_LEN_S; i < arg_length; i++)
+                    {
+                        if ((j = __shortOptionIndex(argv[p][i], options)) < 0)
+                        {
+                            // not notificate yet
+                            break;
+                        }
+
+                        if (options[j].has_arg == REQUIRE_ARGUMENT)
+                        {
+                            param_cnt = arg_length > i + 1 ? 1 : 2;
+                            if (p + param_cnt - 1 >= argc)
+                            {
+                                return PSR_REQ_ARG_HAS_NO_ARG;
+                            }
+                            break;
+                        }
+
+                        if (options[j].has_arg == OPTIONAL_ARGUMENT)
+                        {
+                            break;
+                        }
+                    }
                 }
                 break;
             case REQUIRE_ARGUMENT:
-                param_cnt = (arg_length == OPT_HEADER_LEN_S + 1 ? 2 : 1);
+                param_cnt = (arg_length == OPT_HEADER_LEN_S + sopt_cnt + 1 ? 2 : 1);
                 if (param_cnt == 2)
                 {
                     if (p + 1 >= argc)
@@ -216,19 +258,29 @@ int persoropt(int argc, char **argv, const PsrArgumentObject_t *options, char op
                 }
                 else // param_cnt == 1
                 {
-                    strcpy(buf, &argv[p][OPT_HEADER_LEN_S + 1]);
+                    if (arg_length > OPT_HEADER_LEN_S + sopt_cnt + 1)
+                    {
+                        strcpy(buf, &argv[p][OPT_HEADER_LEN_S + sopt_cnt + 1]);
+                    }
+                    else
+                    {
+                        *optind = p;
+                        return PSR_REQ_ARG_HAS_NO_ARG;
+                    }
                 }
+                sopt_cnt = 0;
                 break;
             case OPTIONAL_ARGUMENT:
                 param_cnt = 1;
-                if (arg_length > OPT_HEADER_LEN_S + 1)
+                if (arg_length > OPT_HEADER_LEN_S + sopt_cnt + 1)
                 {
                     // -aXXX
-                    strcpy(buf, &argv[p][OPT_HEADER_LEN_S + 1]);
+                    strcpy(buf, &argv[p][OPT_HEADER_LEN_S + sopt_cnt + 1]);
                 }
+                sopt_cnt = 0;
                 break;
             default:
-                return PSR_ERROR;
+                return PSR_ERROR - 200;
             }
 
             break;
@@ -267,12 +319,15 @@ int persoropt(int argc, char **argv, const PsrArgumentObject_t *options, char op
     {
         if (__slideArgument(argc, argv, p + i, p - *optind))
         {
-            return PSR_ERROR;
+            return PSR_ERROR - 100;
         }
     }
 
     // update optind
-    *optind += param_cnt;
+    if (sopt_cnt == 0)
+    {
+        *optind += param_cnt;
+    }
     // update optarg
     strcpy(optarg, buf);
 

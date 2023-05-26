@@ -37,6 +37,7 @@ extern "C" {
 #define PSR_REQ_ARG_HAS_NO_ARG  -4
 #define PSR_OPT_ARG_HAS_ONLY_EQ -5
 #define PSR_ERROR               -10
+#define PSR_ERROR_HAS_ARG       -11
 
 // types --------------------
 
@@ -65,7 +66,7 @@ int persoropt(
     int   argc                        ,
     char  **argv                      ,
     const PsrArgumentObject_t *options,
-    char  optarg[PSR_BUF_SIZE]        ,
+    char  **optarg                    ,
     int   *optind
 );
 

@@ -178,7 +178,7 @@ int persoropt(int argc, char **argv, const PsrArgumentObject_t *options, char **
             default:
                 *optind = p;
                 *optarg = NULL;
-                return PSR_ERROR - 300;
+                return PSR_ERROR_HAS_ARG;
             }
 
             break;
@@ -288,7 +288,7 @@ int persoropt(int argc, char **argv, const PsrArgumentObject_t *options, char **
             default:
                 *optind = p;
                 *optarg = NULL;
-                return PSR_ERROR - 200;
+                return PSR_ERROR_HAS_ARG;
             }
 
             break;
@@ -328,7 +328,8 @@ int persoropt(int argc, char **argv, const PsrArgumentObject_t *options, char **
     {
         if (__slideArgument(argc, argv, p + i, p - *optind))
         {
-            return PSR_ERROR - 100;
+            // index out of range
+            return PSR_ERROR;
         }
     }
 

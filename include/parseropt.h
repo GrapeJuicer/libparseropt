@@ -62,7 +62,7 @@ typedef struct
 
 int setHeader(char *__short, char *__long);
 
-int persoropt(
+int parseropt(
     int   argc                        ,
     char  **argv                      ,
     const PsrArgumentObject_t *options,

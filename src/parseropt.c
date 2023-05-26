@@ -49,7 +49,7 @@ int setHeader(char *__short, char *__long)
  * @param optind Parsed parameter index. After parsed, this means the head of the non-option's parameter. At first, this must be 0.
  * @return Found option's ID (= PsrArgumentObject_t.id). If something occured, this returns "Rsr Result" item.
  **/
-int persoropt(int argc, char **argv, const PsrArgumentObject_t *options, char **optarg, int *optind)
+int parseropt(int argc, char **argv, const PsrArgumentObject_t *options, char **optarg, int *optind)
 {
     int p = *optind;
     const size_t OPT_HEADER_LEN_S = strlen(OPT_HEADER_SHORT);

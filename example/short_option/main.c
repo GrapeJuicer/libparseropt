@@ -20,8 +20,8 @@ int main(int argc, char *argv[])
 
     int id;         // Found option's ID. (PsrArgumentObject_t.id)
     char *optarg;   // REQUIRE_ARGUMENT/OPTIONAL_ARGUMENT option's argument. if no argument is given, this values is NULL.
-    int optind = 0; // Start index of non-option arguments (after calling persoropt() function). You must be set 0 or 1.
-    while((id = persoropt(argc, argv, options, &optarg, &optind)) != PSR_NOT_FOUND)
+    int optind = 0; // Start index of non-option arguments (after calling parseropt() function). You must be set 0 or 1.
+    while((id = parseropt(argc, argv, options, &optarg, &optind)) != PSR_NOT_FOUND)
     {
         // find option
         switch (id)

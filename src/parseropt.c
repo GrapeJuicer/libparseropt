@@ -49,7 +49,7 @@ int setHeader(char *__short, char *__long)
  * @param optind Parsed parameter index. After parsed, this means the head of the non-option's parameter. At first, this must be 0.
  * @return Found option's ID (= PsrArgumentObject_t.id). If something occured, this returns "Rsr Result" item.
  **/
-int persoropt(int argc, char **argv, const PsrArgumentObject_t *options, char optarg[PSR_BUF_SIZE], int *optind)
+int persoropt(int argc, char **argv, const PsrArgumentObject_t *options, char **optarg, int *optind)
 {
     int p = *optind;
     const size_t OPT_HEADER_LEN_S = strlen(OPT_HEADER_SHORT);
@@ -58,7 +58,6 @@ int persoropt(int argc, char **argv, const PsrArgumentObject_t *options, char op
     int idx;
     size_t arg_length;
     char *param;
-    char buf[PSR_BUF_SIZE] = "";
     static int sopt_cnt = 0; // for #7
 
     // out of range
@@ -91,7 +90,7 @@ int persoropt(int argc, char **argv, const PsrArgumentObject_t *options, char op
             // is valid option
 
             // search option
-            char tmp[PSR_BUF_SIZE] = "";
+            char tmp[PSR_BUF_SIZE] = {'\0'};
             char *pa = strchr(argv[p] + OPT_HEADER_LEN_L, '=');
             if (pa == NULL)
             {
@@ -112,6 +111,7 @@ int persoropt(int argc, char **argv, const PsrArgumentObject_t *options, char op
             {
                 // invalid option
                 *optind = p;
+                optarg = NULL;
                 return PSR_UNKNOWN_OPTION;
             }
 
@@ -122,14 +122,15 @@ int persoropt(int argc, char **argv, const PsrArgumentObject_t *options, char op
                 if (pa != NULL)
                 {
                     *optind = p;
+                    *optarg = NULL;
                     return PSR_NO_ARG_HAS_ARG;
                 }
                 break;
             case REQUIRE_ARGUMENT:
                 // OK  exe --alpha XXX   pa=null  param_cnt=2
-                // OK  exe --alpha=XXX   pa=8     param_cnt=1
+                // OK  exe --alpha=XXX   pa=7     param_cnt=1
                 // NG  exe --alpha       pa=null  param_cnt=2
-                // NG  exe --alpha=      pa=8     param_cnt=1
+                // NG  exe --alpha=      pa=7     param_cnt=1
                 param_cnt = (pa == NULL ? 2 : 1);
 
                 if (param_cnt == 1)
@@ -138,10 +139,11 @@ int persoropt(int argc, char **argv, const PsrArgumentObject_t *options, char op
                     if (strlen(pa + 1) == 0)
                     {
                         *optind = p;
+                        *optarg = NULL;
                         return PSR_REQ_ARG_HAS_NO_ARG;
                     }
                     // exe --alpha=XXX
-                    strcpy(buf, pa + 1);
+                    *optarg = pa + 1;
                 }
                 else // param_cnt == 2
                 {
@@ -149,14 +151,16 @@ int persoropt(int argc, char **argv, const PsrArgumentObject_t *options, char op
                     if (p + 1 >= argc)
                     {
                         *optind = p;
+                        *optarg = NULL;
                         return PSR_REQ_ARG_HAS_NO_ARG;
                     }
                     // exe --alpha XXX
-                    strcpy(buf, argv[p + 1]);
+                    *optarg = argv[p + 1];
                 }
                 break;
             case OPTIONAL_ARGUMENT:
                 param_cnt = 1;
+                *optarg = NULL;
                 // --alpha=XXX, --alpha=
                 if (pa != NULL)
                 {
@@ -167,12 +171,13 @@ int persoropt(int argc, char **argv, const PsrArgumentObject_t *options, char op
                         return PSR_OPT_ARG_HAS_ONLY_EQ;
                     }
                     // --alpha=XXX
-                    strcpy(buf, pa + 1);
+                    *optarg = pa + 1;
                 }
                 // else --alpha
                 break;
             default:
                 *optind = p;
+                *optarg = NULL;
                 return PSR_ERROR - 300;
             }
 
@@ -188,6 +193,7 @@ int persoropt(int argc, char **argv, const PsrArgumentObject_t *options, char op
             {
                 // invalid option
                 *optind = p;
+                *optarg = NULL;
                 return PSR_UNKNOWN_OPTION;
             }
 
@@ -211,7 +217,6 @@ int persoropt(int argc, char **argv, const PsrArgumentObject_t *options, char op
                 {
                     int i;
                     int j;
-                    int has_req_arg = 0;
                     for (i = OPT_HEADER_LEN_S; i < arg_length; i++)
                     {
                         if ((j = __shortOptionIndex(argv[p][i], options)) < 0)
@@ -225,6 +230,8 @@ int persoropt(int argc, char **argv, const PsrArgumentObject_t *options, char op
                             param_cnt = arg_length > i + 1 ? 1 : 2;
                             if (p + param_cnt - 1 >= argc)
                             {
+                                *optind = p;
+                                *optarg = NULL;
                                 return PSR_REQ_ARG_HAS_NO_ARG;
                             }
                             break;
@@ -245,19 +252,21 @@ int persoropt(int argc, char **argv, const PsrArgumentObject_t *options, char op
                     {
                         // last element
                         *optind = p;
+                        *optarg = NULL;
                         return PSR_REQ_ARG_HAS_NO_ARG;
                     }
-                    strcpy(buf, argv[p + 1]);
+                    *optarg = argv[p + 1];
                 }
                 else // param_cnt == 1
                 {
                     if (arg_length > OPT_HEADER_LEN_S + sopt_cnt + 1)
                     {
-                        strcpy(buf, &argv[p][OPT_HEADER_LEN_S + sopt_cnt + 1]);
+                        *optarg = &argv[p][OPT_HEADER_LEN_S + sopt_cnt + 1];
                     }
                     else
                     {
                         *optind = p;
+                        *optarg = NULL;
                         return PSR_REQ_ARG_HAS_NO_ARG;
                     }
                 }
@@ -268,11 +277,17 @@ int persoropt(int argc, char **argv, const PsrArgumentObject_t *options, char op
                 if (arg_length > OPT_HEADER_LEN_S + sopt_cnt + 1)
                 {
                     // -aXXX
-                    strcpy(buf, &argv[p][OPT_HEADER_LEN_S + sopt_cnt + 1]);
+                    *optarg = &argv[p][OPT_HEADER_LEN_S + sopt_cnt + 1];
+                }
+                else
+                {
+                    *optarg = NULL;
                 }
                 sopt_cnt = 0;
                 break;
             default:
+                *optind = p;
+                *optarg = NULL;
                 return PSR_ERROR - 200;
             }
 
@@ -287,6 +302,7 @@ int persoropt(int argc, char **argv, const PsrArgumentObject_t *options, char op
             if (p >= argc)
             {
             // end: success
+                *optarg = NULL;
                 return PSR_NOT_FOUND;
             }
         }
@@ -321,13 +337,11 @@ int persoropt(int argc, char **argv, const PsrArgumentObject_t *options, char op
     {
         *optind += param_cnt;
     }
-    // update optarg
-    strcpy(optarg, buf);
 
     // callfunc
     if (options[idx].callfunc != NULL)
     {
-        options[idx].callfunc(strcmp(optarg, "") == 0 ? NULL : optarg);
+        options[idx].callfunc(*optarg);
     }
 
     return options[idx].id;

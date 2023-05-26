@@ -18,10 +18,10 @@ int main(int argc, char *argv[])
         PSR_ARG_END
     };
 
-    int id;                     // Found option's ID. (PsrArgumentObject_t.id)
-    char optarg[PSR_BUF_SIZE];  // REQUIRE_ARGUMENT/OPTIONAL_ARGUMENT option's argument. if no argument is given, this values is "".
-    int optind = 0;             // Start index of non-option arguments (after calling persoropt() function). You must be set 0 or 1.
-    while((id = persoropt(argc, argv, options, optarg, &optind)) != PSR_NOT_FOUND)
+    int id;         // Found option's ID. (PsrArgumentObject_t.id)
+    char *optarg;   // REQUIRE_ARGUMENT/OPTIONAL_ARGUMENT option's argument. if no argument is given, this values is NULL.
+    int optind = 0; // Start index of non-option arguments (after calling persoropt() function). You must be set 0 or 1.
+    while((id = persoropt(argc, argv, options, &optarg, &optind)) != PSR_NOT_FOUND)
     {
         // find option
         switch (id)
@@ -35,8 +35,11 @@ int main(int argc, char *argv[])
         case ID_OPT_ARG:
             printf("Optional Argument Option: %s\n", optarg);
             break;
-        default: // PSR_UNKNOWN_OPTION, PSR_NO_ARG_HAS_ARG, PSR_REQ_ARG_HAS_NO_ARG, PSR_ERROR
-            printf("Invalid Argument (%d)\n", id);
+        case PSR_ERROR:
+            printf("Process error\n");
+            break;
+        default: // PSR_UNKNOWN_OPTION, PSR_NO_ARG_HAS_ARG, PSR_REQ_ARG_HAS_NO_ARG, PSR_ERROR_HAS_ARG
+            printf("Invalid Argument: %s\n", argv[optind]);
             return -1;
         }
     }

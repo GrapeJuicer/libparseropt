@@ -18,6 +18,8 @@ extern "C" {
 #define NONE_PRIORITY  0
 #define NONE_CALLFUNC  NULL
 
+#define NONE_DESC      NULL
+
 #define PSR_ARG_END { \
     NONE_ID,          \
     NONE_SHORT_OPT,   \
@@ -25,6 +27,11 @@ extern "C" {
     NONE_HAS_ARG,     \
     NONE_PRIORITY,    \
     NONE_CALLFUNC     \
+}
+
+#define PSR_DESC_END { \
+    NONE_ID,           \
+    NONE_DESC          \
 }
 
 #define OPT_DEFAULT_HEADER_SHORT "-"
@@ -58,6 +65,12 @@ typedef struct
     void          (*callfunc)(const char *arg);
 } PsrArgumentObject_t;
 
+typedef struct
+{
+    int id;
+    char *desc;
+} PsrDescription_t;
+
 // prototype declarations --------------------
 
 int setHeader(char *__short, char *__long);
@@ -69,6 +82,13 @@ int parseropt(
     char  **optarg                    ,
     int   *optind
 );
+
+void psrHDesc(
+    const PsrArgumentObject_t *options,
+    const PsrDescription_t *descs
+);
+
+void psrHOptionNote(void);
 
 int isPsrArgumentEnd (
     const PsrArgumentObject_t *options

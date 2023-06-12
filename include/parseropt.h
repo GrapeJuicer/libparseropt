@@ -70,6 +70,10 @@ int parseropt(
     int   *optind
 );
 
+int isPsrArgumentEnd (
+    const PsrArgumentObject_t *options
+);
+
 // --------------------
 
 #ifdef __cplusplus

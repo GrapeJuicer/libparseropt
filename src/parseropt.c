@@ -10,7 +10,6 @@ static char OPT_HEADER_SHORT[PSR_BUF_SIZE] = OPT_DEFAULT_HEADER_SHORT;
 // prototype declarations --------------------
 
 int __shortOptionIndex (char s, const PsrArgumentObject_t *options);
-int __isPsrArgumentEnd (const PsrArgumentObject_t *options);
 int __slideArgument    (int argc, char *argv[], size_t index, size_t n);
 int __longOptionIndex  (char *s, const PsrArgumentObject_t *options);
 
@@ -358,7 +357,7 @@ int parseropt(int argc, char **argv, const PsrArgumentObject_t *options, char **
 int __shortOptionIndex(char s, const PsrArgumentObject_t *options)
 {
     int i;
-    for (i = 0; __isPsrArgumentEnd(&options[i]) == 0; i++)
+    for (i = 0; isPsrArgumentEnd(&options[i]) == 0; i++)
     {
         if (options[i].short_opt != NONE_SHORT_OPT && s == options[i].short_opt)
         {
@@ -376,7 +375,7 @@ int __shortOptionIndex(char s, const PsrArgumentObject_t *options)
  * @param options Item's address of options. Not array.
  * @return End: 1 / Not end: 0
  **/
-int __isPsrArgumentEnd(const PsrArgumentObject_t *options)
+int isPsrArgumentEnd(const PsrArgumentObject_t *options)
 {
     return (options->id        == NONE_ID                 &&
             options->short_opt == NONE_SHORT_OPT          &&
@@ -423,7 +422,7 @@ int __slideArgument(int argc, char *argv[], size_t index, size_t n)
 int __longOptionIndex(char *s, const PsrArgumentObject_t *options)
 {
     int i;
-    for (i = 0; __isPsrArgumentEnd(&options[i]) == 0; i++)
+    for (i = 0; isPsrArgumentEnd(&options[i]) == 0; i++)
     {
         if (strcmp(options[i].long_opt, NONE_LONG_OPT) != 0 && strcmp(s, options[i].long_opt) == 0)
         {

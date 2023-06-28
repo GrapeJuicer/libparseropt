@@ -18,6 +18,8 @@ extern "C" {
 #define NONE_PRIORITY  0
 #define NONE_CALLFUNC  NULL
 
+#define NONE_DESC      NULL
+
 #define PSR_ARG_END { \
     NONE_ID,          \
     NONE_SHORT_OPT,   \
@@ -25,6 +27,11 @@ extern "C" {
     NONE_HAS_ARG,     \
     NONE_PRIORITY,    \
     NONE_CALLFUNC     \
+}
+
+#define PSR_DESC_END { \
+    NONE_ID,           \
+    NONE_DESC          \
 }
 
 #define OPT_DEFAULT_HEADER_SHORT "-"
@@ -38,6 +45,10 @@ extern "C" {
 #define PSR_OPT_ARG_HAS_ONLY_EQ -5
 #define PSR_ERROR               -10
 #define PSR_ERROR_HAS_ARG       -11
+
+// function macro
+#define psrHDesc(options, descs) psrHDescWithConfig(options, descs, &DEFAULT_PSR_CONFIG)
+#define psrHelp(options, descs, usage, prefix, suffix) psrHelpWithConfig(options, descs, usage, prefix, suffix, &DEFAULT_PSR_CONFIG)
 
 // types --------------------
 
@@ -58,6 +69,28 @@ typedef struct
     void          (*callfunc)(const char *arg);
 } PsrArgumentObject_t;
 
+typedef struct
+{
+    int id;
+    char *desc;
+} PsrDescription_t;
+
+// |    -a, --alpha        This is a description.
+//  <--> indent
+//                 <------> margin
+//                         <---------------------------------> desc_width
+typedef struct
+{
+    unsigned int indent    ;
+    char *       sep       ;
+    unsigned int margin    ;
+    unsigned int desc_width;
+} PsrHelpConfig_t;
+
+// variables --------------------
+
+extern const PsrHelpConfig_t DEFAULT_PSR_CONFIG;
+
 // prototype declarations --------------------
 
 int setHeader(char *__short, char *__long);
@@ -68,6 +101,27 @@ int parseropt(
     const PsrArgumentObject_t *options,
     char  **optarg                    ,
     int   *optind
+);
+
+void psrHelpWithConfig(
+    const PsrArgumentObject_t *options,
+    const PsrDescription_t *descs,
+    const char *usage,
+    const char *prefix,
+    const char *suffix,
+    const PsrHelpConfig_t *config
+);
+
+void psrHDescWithConfig(
+    const PsrArgumentObject_t *options,
+    const PsrDescription_t *descs,
+    const PsrHelpConfig_t *config
+);
+
+void psrHOptionNote(void);
+
+int isPsrArgumentEnd (
+    const PsrArgumentObject_t *options
 );
 
 // --------------------

@@ -10,4 +10,5 @@ target_include_directories(parseropt
 target_sources(parseropt
     PRIVATE
         src/parseropt.c
+        src/help.c
 )

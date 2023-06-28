@@ -19,6 +19,35 @@ const PsrHelpConfig_t DEFAULT_PSR_CONFIG = {
 int __isPsrDescEnd(const PsrDescription_t *desc);
 
 
+// usage, prefix, suffix is nullable
+void psrHelpWithConfig(int argc, const char **argv, const PsrArgumentObject_t *options, const PsrDescription_t *descs, const char *usage, const char *prefix, const char *suffix, const PsrHelpConfig_t *config)
+{
+    // usage
+    if (usage == NULL)
+    {
+        // printf("");
+    }
+    else
+    {
+        printf("Usage: %s\n\n", usage);
+    }
+
+    // prefix
+    if (prefix != NULL)
+    {
+        printf("%s\n\n", prefix);
+    }
+
+    // options
+    psrHDescWithConfig(options, descs, config);
+
+    // suffix
+    if (suffix != NULL)
+    {
+        printf("%s\n", suffix);
+    }
+}
+
 
 void psrHDescWithConfig(const PsrArgumentObject_t *options, const PsrDescription_t *descs, const PsrHelpConfig_t *config)
 {

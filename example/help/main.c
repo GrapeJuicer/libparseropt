@@ -54,10 +54,10 @@ int main(int argc, char *argv[])
         switch (id)
         {
         case ID_HELP:
-            psrHDesc(options, descs);
+            psrHelp(options, descs, "help [options...]", NULL, NULL);
             return 0;
         case ID_HELP2:
-            psrHDescWithConfig(options, descs, &help_conf);
+            psrHelpWithConfig(options, descs, "help [options...]", "This is a prefix text.", "This is a suffix text.", &help_conf);
             return 0;
         case ID_NO_ARG:
             printf("No Argument Option\n");

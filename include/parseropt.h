@@ -48,7 +48,7 @@ extern "C" {
 
 // function macro
 #define psrHDesc(options, descs) psrHDescWithConfig(options, descs, &DEFAULT_PSR_CONFIG)
-
+#define psrHelp(options, descs, usage, prefix, suffix) psrHelpWithConfig(options, descs, usage, prefix, suffix, &DEFAULT_PSR_CONFIG)
 
 // types --------------------
 

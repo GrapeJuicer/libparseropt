@@ -20,22 +20,21 @@ int __isPsrDescEnd(const PsrDescription_t *desc);
 
 
 // usage, prefix, suffix is nullable
-void psrHelpWithConfig(int argc, const char **argv, const PsrArgumentObject_t *options, const PsrDescription_t *descs, const char *usage, const char *prefix, const char *suffix, const PsrHelpConfig_t *config)
+void psrHelpWithConfig(const PsrArgumentObject_t *options, const PsrDescription_t *descs, const char *usage, const char *prefix, const char *suffix, const PsrHelpConfig_t *config)
 {
-    // usage
     if (usage == NULL)
     {
-        // printf("");
+        fprintf(stderr, "failed to print help.\n");
+        return;
     }
-    else
-    {
-        printf("Usage: %s\n\n", usage);
-    }
+
+    // usage
+    printf("Usage: %s\n", usage);
 
     // prefix
     if (prefix != NULL)
     {
-        printf("%s\n\n", prefix);
+        printf("\n%s\n\n", prefix);
     }
 
     // options
@@ -44,7 +43,7 @@ void psrHelpWithConfig(int argc, const char **argv, const PsrArgumentObject_t *o
     // suffix
     if (suffix != NULL)
     {
-        printf("%s\n", suffix);
+        printf("\n%s\n", suffix);
     }
 }
 

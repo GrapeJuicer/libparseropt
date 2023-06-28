@@ -103,6 +103,15 @@ int parseropt(
     int   *optind
 );
 
+void psrHelpWithConfig(
+    const PsrArgumentObject_t *options,
+    const PsrDescription_t *descs,
+    const char *usage,
+    const char *prefix,
+    const char *suffix,
+    const PsrHelpConfig_t *config
+);
+
 void psrHDescWithConfig(
     const PsrArgumentObject_t *options,
     const PsrDescription_t *descs,

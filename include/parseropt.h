@@ -46,6 +46,10 @@ extern "C" {
 #define PSR_ERROR               -10
 #define PSR_ERROR_HAS_ARG       -11
 
+// function macro
+#define psrHDesc(options, descs) psrHDescWithConfig(options, descs, &DEFAULT_PSR_CONFIG)
+
+
 // types --------------------
 
 typedef enum
@@ -71,6 +75,22 @@ typedef struct
     char *desc;
 } PsrDescription_t;
 
+// |    -a, --alpha        This is a description.
+//  <--> indent
+//                 <------> margin
+//                         <---------------------------------> desc_width
+typedef struct
+{
+    unsigned int indent    ;
+    char *       sep       ;
+    unsigned int margin    ;
+    unsigned int desc_width;
+} PsrHelpConfig_t;
+
+// variables --------------------
+
+extern const PsrHelpConfig_t DEFAULT_PSR_CONFIG;
+
 // prototype declarations --------------------
 
 int setHeader(char *__short, char *__long);
@@ -83,9 +103,10 @@ int parseropt(
     int   *optind
 );
 
-void psrHDesc(
+void psrHDescWithConfig(
     const PsrArgumentObject_t *options,
-    const PsrDescription_t *descs
+    const PsrDescription_t *descs,
+    const PsrHelpConfig_t *config
 );
 
 void psrHOptionNote(void);

@@ -4,6 +4,7 @@
 enum
 {
     ID_HELP,
+    ID_HELP2,
     ID_NO_ARG,
     ID_REQ_ARG,
     ID_OPT_ARG,
@@ -16,6 +17,7 @@ int main(int argc, char *argv[])
     // declare options
     PsrArgumentObject_t options[] = {
         {.id = ID_HELP      , .short_opt = 'h'           , .long_opt = "help"       , .has_arg = NO_ARGUMENT      , .priority = NONE_PRIORITY, .callfunc = NONE_CALLFUNC},
+        {.id = ID_HELP2      , .short_opt = 'H'           , .long_opt = "help2"      , .has_arg = NO_ARGUMENT      , .priority = NONE_PRIORITY, .callfunc = NONE_CALLFUNC},
         {.id = ID_NO_ARG    , .short_opt = 'n'           , .long_opt = "no"         , .has_arg = NO_ARGUMENT      , .priority = NONE_PRIORITY, .callfunc = NONE_CALLFUNC},
         {.id = ID_REQ_ARG   , .short_opt = 'r'           , .long_opt = "require"    , .has_arg = REQUIRE_ARGUMENT , .priority = NONE_PRIORITY, .callfunc = NONE_CALLFUNC},
         {.id = ID_OPT_ARG   , .short_opt = 'o'           , .long_opt = "optional"   , .has_arg = OPTIONAL_ARGUMENT, .priority = NONE_PRIORITY, .callfunc = NONE_CALLFUNC},
@@ -25,14 +27,22 @@ int main(int argc, char *argv[])
     };
 
     PsrDescription_t descs[] = {
-        {.id = ID_HELP      , .desc = "Help option."      },
-        {.id = ID_NO_ARG    , .desc = NULL                }, // not shown
-        {.id = ID_REQ_ARG   , .desc = "Require argument." },
-        {.id = ID_OPT_ARG   , .desc = "Optional argument."},
-        {.id = ID_SHORT_ONLY, .desc = "Short option only."},
-    //  {.id = ID_LONG_ONLY , .desc = "Long option only." }, // not shown
-        {.id = 999999       , .desc = "Unknown."          }, // not used
+        {.id = ID_HELP      , .desc = "Help option."                   },
+        {.id = ID_HELP      , .desc = "Help option with Custom config."},
+        {.id = ID_NO_ARG    , .desc = NULL                             }, // not shown
+        {.id = ID_REQ_ARG   , .desc = "Require argument."              },
+        {.id = ID_OPT_ARG   , .desc = "Optional argument."             },
+        {.id = ID_SHORT_ONLY, .desc = "Short option only."             },
+    //  {.id = ID_LONG_ONLY , .desc = "Long option only."              }, // not shown
+        {.id = 999999       , .desc = "Unknown."                       }, // not used
         PSR_DESC_END
+    };
+
+    PsrHelpConfig_t help_conf = {
+        .indent     = 10    ,
+        .sep        = " | " ,
+        .margin     = 2     ,
+        .desc_width = 20    ,
     };
 
     int id;         // Found option's ID. (PsrArgumentObject_t.id)
@@ -45,6 +55,9 @@ int main(int argc, char *argv[])
         {
         case ID_HELP:
             psrHDesc(options, descs);
+            return 0;
+        case ID_HELP2:
+            psrHDescWithConfig(options, descs, &help_conf);
             return 0;
         case ID_NO_ARG:
             printf("No Argument Option\n");

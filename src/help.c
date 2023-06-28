@@ -8,21 +8,41 @@
 #endif
 
 
+const PsrHelpConfig_t DEFAULT_PSR_CONFIG = {
+    .indent     =  2,
+    .sep     =  ", ",
+    .margin     =  8,
+    .desc_width = 60,
+};
+
+
 int __isPsrDescEnd(const PsrDescription_t *desc);
 
 
-void psrHDesc(const PsrArgumentObject_t *options, const PsrDescription_t *descs)
+
+void psrHDescWithConfig(const PsrArgumentObject_t *options, const PsrDescription_t *descs, const PsrHelpConfig_t *config)
 {
     int swidth = 0;
     int lwidth = 0;
-    const int indent = 2;
-    const int margin = 8;
-    // const desc_width = 60;
+    const unsigned int indent = config->indent;
+    const char *sep = config->sep;
+    const unsigned int margin = config->margin;
+    const unsigned int desc_width = config->desc_width;
+
+    if (sep == NULL)
+    {
+        // fail
+        return;
+    }
 
     // |    -a, --alpha        This is a description.
     //  <--> indent
+    //        <> sep
     //                 <------> margin
     //                         <---------------------------------> desc_width
+
+    // header
+    printf("Options:\n");
 
     // calc width
     for (int i = 0; isPsrArgumentEnd(&options[i]) == 0; i++)
@@ -116,10 +136,17 @@ void psrHDesc(const PsrArgumentObject_t *options, const PsrDescription_t *descs)
             }
         }
 
-        // comma
+        // option separator
         if (swidth > 0 && lwidth > 0)
         {
-            printf("%s", (sexist && lexist ? ", " : "  "));
+            if (sexist && lexist)
+            {
+                printf("%s", sep);
+            }
+            else
+            {
+                printf("%*s", (int)strlen(sep), "");
+            }
         }
 
         // long option

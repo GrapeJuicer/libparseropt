@@ -3,22 +3,37 @@
 #include <stdio.h>
 #include <string.h>
 
+// defines --------------------
+
 #ifndef MAX
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 #endif
 
+// variables --------------------
 
 const PsrHelpConfig_t DEFAULT_PSR_CONFIG = {
-    .indent     =  2,
-    .sep     =  ", ",
-    .margin     =  8,
-    .desc_width = 60,
+    .indent     =  2   ,
+    .sep        =  ", ",
+    .margin     =  8   ,
+    .desc_width = 60   ,
 };
 
+// prototype declarations --------------------
 
 int __isPsrDescEnd(const PsrDescription_t *desc);
+void __printHDescDescriotion(const char *s, int desc_indent);
 
+// functions --------------------
 
+/**
+ * @brief Print help message with config.
+ * @param options Option list.
+ * @param descs Description list.
+ * @param usage command usage: e.g. "command [options...] source target"
+ * @param prefix prifix text. Written before the description.
+ * @param prefix suffix text. Written at the end.
+ * @param config Help message config.
+ **/
 // usage, prefix, suffix is nullable
 void psrHelpWithConfig(const PsrArgumentObject_t *options, const PsrDescription_t *descs, const char *usage, const char *prefix, const char *suffix, const PsrHelpConfig_t *config)
 {
@@ -40,6 +55,9 @@ void psrHelpWithConfig(const PsrArgumentObject_t *options, const PsrDescription_
     // options
     psrHDescWithConfig(options, descs, config);
 
+    // note
+    psrHOptionNote();
+
     // suffix
     if (suffix != NULL)
     {
@@ -48,6 +66,12 @@ void psrHelpWithConfig(const PsrArgumentObject_t *options, const PsrDescription_
 }
 
 
+/**
+ * @brief Print description (help message item) with config.
+ * @param options Option list.
+ * @param descs Description list.
+ * @param config Help message config.
+ **/
 void psrHDescWithConfig(const PsrArgumentObject_t *options, const PsrDescription_t *descs, const PsrHelpConfig_t *config)
 {
     int swidth = 0;
@@ -56,6 +80,7 @@ void psrHDescWithConfig(const PsrArgumentObject_t *options, const PsrDescription
     const char *sep = config->sep;
     const unsigned int margin = config->margin;
     const unsigned int desc_width = config->desc_width;
+    int desc_total_indent;
 
     if (sep == NULL)
     {
@@ -117,6 +142,9 @@ void psrHDescWithConfig(const PsrArgumentObject_t *options, const PsrDescription
             }
         }
     }
+
+    // set desc indent size
+    desc_total_indent = indent + swidth + (swidth > 0 && lwidth > 0 ? strlen(sep) : 0) + lwidth + margin;
 
     for (int i = 0; isPsrArgumentEnd(&options[i]) == 0; i++)
     {
@@ -203,12 +231,35 @@ void psrHDescWithConfig(const PsrArgumentObject_t *options, const PsrDescription
         printf("%*s", margin, "");
 
         // description
-        //      future function: override '\n' to support newline in description.
-        printf("%s\n", descs[desc_idx].desc);
+        __printHDescDescriotion(descs[desc_idx].desc, desc_total_indent);
     }
 }
 
 
+/**
+ * @brief Print description.
+ * @param s Description string.
+ * @param desc_indent description indent size.
+ **/
+void __printHDescDescriotion(const char *s, int desc_indent)
+{
+    char *current = (char *)s;
+    char *next;
+
+    while ((next = strchr(current, '\n')) != NULL)
+    {
+        next++;
+        printf("%.*s%*s", (int)(next - current), current, desc_indent, "");
+        current = next;
+    }
+
+    printf("%s\n", current);
+}
+
+
+/**
+ * @brief Print note about option.
+ **/
 void psrHOptionNote(void)
 {
     printf("It is also possible to specify the options in the following:\n");

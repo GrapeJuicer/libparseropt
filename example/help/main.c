@@ -27,14 +27,14 @@ int main(int argc, char *argv[])
     };
 
     PsrDescription_t descs[] = {
-        {.id = ID_HELP      , .desc = "Help option."                   },
-        {.id = ID_HELP      , .desc = "Help option with Custom config."},
-        {.id = ID_NO_ARG    , .desc = NULL                             }, // not shown
-        {.id = ID_REQ_ARG   , .desc = "Require argument."              },
-        {.id = ID_OPT_ARG   , .desc = "Optional argument."             },
-        {.id = ID_SHORT_ONLY, .desc = "Short option only."             },
-    //  {.id = ID_LONG_ONLY , .desc = "Long option only."              }, // not shown
-        {.id = 999999       , .desc = "Unknown."                       }, // not used
+        {.id = ID_HELP      , .desc = "Help option."                           },
+        {.id = ID_HELP      , .desc = "Help option with Custom config."        },
+        {.id = ID_NO_ARG    , .desc = NULL                                     }, // not shown
+        {.id = ID_REQ_ARG   , .desc = "Require argument.\nYou can use \'\\n\'."},
+        {.id = ID_OPT_ARG   , .desc = "Optional argument."                     },
+        {.id = ID_SHORT_ONLY, .desc = "Short option only."                     },
+    //  {.id = ID_LONG_ONLY , .desc = "Long option only."                      }, // not shown
+        {.id = 999999       , .desc = "Unknown."                               }, // not used
         PSR_DESC_END
     };
 

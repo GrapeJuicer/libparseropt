@@ -2,6 +2,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <stdbool.h>
 
 // defines --------------------
 
@@ -21,7 +22,7 @@ const PsrHelpConfig_t DEFAULT_PSR_CONFIG = {
 // prototype declarations --------------------
 
 int __isPsrDescEnd(const PsrDescription_t *desc);
-void __printHDescDescriotion(const char *s, int desc_indent);
+int __printHDescDescriotion(const char *s, int desc_indent, int width);
 
 // functions --------------------
 
@@ -231,7 +232,11 @@ void psrHDescWithConfig(const PsrArgumentObject_t *options, const PsrDescription
         printf("%*s", margin, "");
 
         // description
-        __printHDescDescriotion(descs[desc_idx].desc, desc_total_indent);
+        if (__printHDescDescriotion(descs[desc_idx].desc, desc_total_indent, config->desc_width))
+        {
+            fprintf(stderr, "Error: Failed to print description.");
+            return;
+        }
     }
 }
 
@@ -241,19 +246,109 @@ void psrHDescWithConfig(const PsrArgumentObject_t *options, const PsrDescription
  * @param s Description string.
  * @param desc_indent description indent size.
  **/
-void __printHDescDescriotion(const char *s, int desc_indent)
+int __printHDescDescriotion(const char *s, int desc_indent, int width)
 {
     char *current = (char *)s;
-    char *next;
+    int len = 0, i = 0;
+    bool lf_returned = false;
+    bool prev_space = false;
 
-    while ((next = strchr(current, '\n')) != NULL)
+    if (s == NULL || width < 2)
     {
-        next++;
-        printf("%.*s%*s", (int)(next - current), current, desc_indent, "");
-        current = next;
+        return 1;
     }
 
-    printf("%s\n", current);
+    // get last index
+    char *last = current + strlen(current) - 1;
+    while(last >= current && last[0] == ' ')
+    {
+        last--;
+    }
+
+    while (1)
+    {
+        if (i == 0 && prev_space && current[i] == ' ')
+        {
+            current++;
+            continue;
+        }
+
+        if (i == 0 && current > s && current[i] != '\n')
+        {
+            // indent
+            printf("%*s", desc_indent, "");
+        }
+
+        // word sep / LF / last character detected
+        if ((!lf_returned && current[i] == ' ') || current[i] == '\n' || &current[i] >= last)
+        {
+            // not width overflow
+            if (i <= width)
+            {
+                // is end character
+                if (&current[i] >= last)
+                {
+                    // end
+                    printf("%.*s\n", (int)(last - current + 1), current);
+                    break;
+                }
+
+                // is \n
+                if ((lf_returned = (current[i] == '\n')))
+                {
+                    printf("%.*s\n", i, current);
+
+                    // newline
+                    current = &current[i + 1];
+                    i = 0;
+                    len = 0;
+                }
+                // is space
+                else
+                {
+                    // set length without bottom space
+                    if (!prev_space)
+                    {
+                        len = i;
+                        prev_space = true;
+                    }
+                    // next index
+                    i++;
+                }
+            }
+            // width overflow
+            else
+            {
+                // If the number of characters in a word exceeds the specified width
+                if (len == 0)
+                {
+                    printf("%.*s-\n", width - 1, current);
+                    current = &current[width - 1];
+                }
+                // normally auto newline
+                else
+                {
+                    printf("%.*s\n", len, current);
+                    current = &current[len + 1];
+                    prev_space = true;
+                }
+
+                // newline
+                i = 0;
+                len = 0;
+            }
+        }
+        // non-specific character
+        else
+        {
+            // next index
+            lf_returned = false;
+            prev_space = false;
+            i++;
+        }
+    }
+
+    return 0;
 }
 
 

@@ -1,4 +1,6 @@
 #include <stdio.h>
+
+#include "termsz/termsz.h"
 #include "parseropt.h"
 
 enum
@@ -17,7 +19,7 @@ int main(int argc, char *argv[])
     // declare options
     PsrArgumentObject_t options[] = {
         {.id = ID_HELP      , .short_opt = 'h'           , .long_opt = "help"       , .has_arg = NO_ARGUMENT      , .priority = NONE_PRIORITY, .callfunc = NONE_CALLFUNC},
-        {.id = ID_HELP2      , .short_opt = 'H'           , .long_opt = "help2"      , .has_arg = NO_ARGUMENT      , .priority = NONE_PRIORITY, .callfunc = NONE_CALLFUNC},
+        {.id = ID_HELP2     , .short_opt = 'H'           , .long_opt = "help2"      , .has_arg = NO_ARGUMENT      , .priority = NONE_PRIORITY, .callfunc = NONE_CALLFUNC},
         {.id = ID_NO_ARG    , .short_opt = 'n'           , .long_opt = "no"         , .has_arg = NO_ARGUMENT      , .priority = NONE_PRIORITY, .callfunc = NONE_CALLFUNC},
         {.id = ID_REQ_ARG   , .short_opt = 'r'           , .long_opt = "require"    , .has_arg = REQUIRE_ARGUMENT , .priority = NONE_PRIORITY, .callfunc = NONE_CALLFUNC},
         {.id = ID_OPT_ARG   , .short_opt = 'o'           , .long_opt = "optional"   , .has_arg = OPTIONAL_ARGUMENT, .priority = NONE_PRIORITY, .callfunc = NONE_CALLFUNC},
@@ -39,11 +41,25 @@ int main(int argc, char *argv[])
     };
 
     PsrHelpConfig_t help_conf = {
-        .indent     = 10    ,
-        .sep        = " | " ,
-        .margin     = 2     ,
-        .desc_width = 20    ,
+        .indent     = 2   ,
+        .sep        = ", ",
+        .margin     = 8   ,
+        .desc_width = 60  ,
     };
+
+
+    /////////////////////////////////////////////////////////////////////////////
+    // Use autowidth if there are two or more spaces to describe the options
+    int col;
+    if (getTerminalSize(NULL, &col) == 0)
+    {
+        int dw_tmp = col - psrHDescOptionWidth(options, &help_conf, NULL, NULL);
+        if (dw_tmp > 1)
+        {
+            help_conf.desc_width = dw_tmp;
+        }
+    }
+    /////////////////////////////////////////////////////////////////////////////
 
     int id;         // Found option's ID. (PsrArgumentObject_t.id)
     char *optarg;   // REQUIRE_ARGUMENT/OPTIONAL_ARGUMENT option's argument. if no argument is given, this values is NULL.

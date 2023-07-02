@@ -57,6 +57,7 @@ void psrHelpWithConfig(const PsrArgumentObject_t *options, const PsrDescription_
     psrHDescWithConfig(options, descs, config);
 
     // note
+    printf("\n");
     psrHOptionNote();
 
     // suffix
@@ -75,17 +76,16 @@ void psrHelpWithConfig(const PsrArgumentObject_t *options, const PsrDescription_
  **/
 void psrHDescWithConfig(const PsrArgumentObject_t *options, const PsrDescription_t *descs, const PsrHelpConfig_t *config)
 {
-    int swidth = 0;
-    int lwidth = 0;
+    int swidth, lwidth, desc_total_indent;
     const unsigned int indent = config->indent;
     const char *sep = config->sep;
     const unsigned int margin = config->margin;
     const unsigned int desc_width = config->desc_width;
-    int desc_total_indent;
 
     if (sep == NULL)
     {
         // fail
+        fprintf(stderr, "Error: Failed to print description.\n");
         return;
     }
 
@@ -98,54 +98,11 @@ void psrHDescWithConfig(const PsrArgumentObject_t *options, const PsrDescription
     // header
     printf("Options:\n");
 
-    // calc width
-    for (int i = 0; isPsrArgumentEnd(&options[i]) == 0; i++)
+    if ((desc_total_indent = psrHDescOptionWidth(options, config, &swidth, &lwidth)) == -1)
     {
-        if (options[i].short_opt != NONE_SHORT_OPT)
-        {
-            // -a           ... no arg      2
-            // -b ARG       ... req arg     6
-            // -c[ARG]     ... opt arg     7
-            switch (options[i].has_arg)
-            {
-            case NO_ARGUMENT:
-                swidth = MAX(swidth, 2);
-                break;
-            case REQUIRE_ARGUMENT:
-                swidth = MAX(swidth, 6);
-                break;
-            case OPTIONAL_ARGUMENT:
-                swidth = MAX(swidth, 7);
-                break;
-            default:
-                return;
-            }
-        }
-        if (strcmp(options[i].long_opt, NONE_LONG_OPT))
-        {
-            // --alpha           ... no arg      n + 2
-            // --alpha ARG       ... req arg     n + 6
-            // --alpha=[ARG]     ... opt arg     n + 8
-            int tmp = strlen(options[i].long_opt);
-            switch (options[i].has_arg)
-            {
-            case NO_ARGUMENT:
-                lwidth = MAX(lwidth, tmp + 2);
-                break;
-            case REQUIRE_ARGUMENT:
-                lwidth = MAX(lwidth, tmp + 6);
-                break;
-            case OPTIONAL_ARGUMENT:
-                lwidth = MAX(lwidth, tmp + 8);
-                break;
-            default:
-                return;
-            }
-        }
+        fprintf(stderr, "Error: Failed to get option usage description width.\n");
+        return;
     }
-
-    // set desc indent size
-    desc_total_indent = indent + swidth + (swidth > 0 && lwidth > 0 ? strlen(sep) : 0) + lwidth + margin;
 
     for (int i = 0; isPsrArgumentEnd(&options[i]) == 0; i++)
     {
@@ -234,7 +191,7 @@ void psrHDescWithConfig(const PsrArgumentObject_t *options, const PsrDescription
         // description
         if (__printHDescDescriotion(descs[desc_idx].desc, desc_total_indent, config->desc_width))
         {
-            fprintf(stderr, "Error: Failed to print description.");
+            fprintf(stderr, "Error: Failed to print description.\n");
             return;
         }
     }
@@ -371,4 +328,86 @@ void psrHOptionNote(void)
 int __isPsrDescEnd(const PsrDescription_t *desc)
 {
     return (desc->id == NONE_ID && desc->desc == NONE_DESC) ? 1 : 0;
+}
+
+
+/**
+ * @brief Get option usage description width. See for more details on https://github.com/GrapeJuicer/libparseropt/wiki/psrHDescOptionWidth%E9%96%A2%E6%95%B0
+ * @param options Option list.
+ * @param config Help message config.
+ * @param swidth Short option usage description width.
+ * @param lwidth Long option usage description width.
+ * @return success(config==NULL): 0 / success(config!=NULL): total width / failed: -1
+ **/
+int psrHDescOptionWidth(const PsrArgumentObject_t *options, const PsrHelpConfig_t *config, int *swidth, int *lwidth)
+{
+    int _swidth = 0;
+    int _lwidth = 0;
+
+    // calc width
+    for (int i = 0; isPsrArgumentEnd(&options[i]) == 0; i++)
+    {
+        // swidth
+        if (options[i].short_opt != NONE_SHORT_OPT)
+        {
+            // -a           ... no arg      2
+            // -b ARG       ... req arg     6
+            // -c[ARG]      ... opt arg     7
+            switch (options[i].has_arg)
+            {
+            case NO_ARGUMENT:
+                _swidth = MAX(_swidth, 2);
+                break;
+            case REQUIRE_ARGUMENT:
+                _swidth = MAX(_swidth, 6);
+                break;
+            case OPTIONAL_ARGUMENT:
+                _swidth = MAX(_swidth, 7);
+                break;
+            default:
+                return -1;
+            }
+        }
+
+        // lwidth
+        if (strcmp(options[i].long_opt, NONE_LONG_OPT))
+        {
+            // --alpha           ... no arg      n + 2
+            // --alpha ARG       ... req arg     n + 6
+            // --alpha=[ARG]     ... opt arg     n + 8
+            int tmp = strlen(options[i].long_opt);
+            switch (options[i].has_arg)
+            {
+            case NO_ARGUMENT:
+                _lwidth = MAX(_lwidth, tmp + 2);
+                break;
+            case REQUIRE_ARGUMENT:
+                _lwidth = MAX(_lwidth, tmp + 6);
+                break;
+            case OPTIONAL_ARGUMENT:
+                _lwidth = MAX(_lwidth, tmp + 8);
+                break;
+            default:
+                return -1;
+            }
+        }
+    }
+
+    if (swidth != NULL)
+    {
+        *swidth = _swidth;
+    }
+
+    if (lwidth != NULL)
+    {
+        *lwidth = _lwidth;
+    }
+
+    // set desc indent size
+    if (config == NULL)
+    {
+        return 0;
+    }
+
+    return config->indent + _swidth + (_swidth > 0 && _lwidth > 0 ? strlen(config->sep) : 0) + _lwidth + config->margin;
 }

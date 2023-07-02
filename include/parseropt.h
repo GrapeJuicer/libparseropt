@@ -120,8 +120,15 @@ void psrHDescWithConfig(
 
 void psrHOptionNote(void);
 
-int isPsrArgumentEnd (
+int isPsrArgumentEnd(
     const PsrArgumentObject_t *options
+);
+
+int psrHDescOptionWidth(
+    const PsrArgumentObject_t *options,
+    const PsrHelpConfig_t *config,
+    int *swidth,
+    int *lwidth
 );
 
 // --------------------

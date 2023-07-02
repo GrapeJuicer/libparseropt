@@ -7,6 +7,7 @@
         "files.encoding": "shiftjis"
     },
     "files.associations": {
-        "parseropt.h": "c"
+        "parseropt.h": "c",
+        "termsz.h": "c"
     }
 }

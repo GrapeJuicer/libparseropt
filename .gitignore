@@ -71,3 +71,4 @@ example/*/*
 !example/*/*.h
 !example/*/Makefile
 !example/*/make.bat
+!example/help_autowidth/termsz
